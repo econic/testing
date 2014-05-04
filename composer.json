@@ -1,0 +1,13 @@
+{
+	"name": "econic/testers",
+	"type": "typo3-flow-package",
+	"description": "Testing Utilities for TYPO3 Flow Packages",
+	"require": {
+		"typo3/flow": "*"
+	},
+	"autoload": {
+		"psr-0": {
+			"Econic\\Testers": "Classes"
+		}
+	}
+}
