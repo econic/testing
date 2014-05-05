@@ -208,7 +208,7 @@ trait PropertyCheck {
 		$propertySetterName =  $this->getMethodNameForProperty($propertyName, 'set');
 		$this->assertTrue(
 			method_exists($this->fixture, $propertySetterName),
-			'Class <' . get_class($this->fixture) . '> has no getter for property <' . $propertyName . '>, tried ' . $propertySetterName . '($value)'
+			'Class <' . get_class($this->fixture) . '> has no setter for property <' . $propertyName . '>, tried ' . $propertySetterName . '($value)'
 		);
 	}
 
