@@ -75,7 +75,7 @@ trait PropertyCheck {
 	protected function checkSimplePropertyWithValue($propertyName, $value, $defaultValue) {
 
 		// assert that methods exist
-		$this->assertGetterAndSetterExist($propertyName);
+		$this->assertPropertyFunctionsExist($propertyName, array('get','set'));
 
 		$propertyGetterName = $this->getMethodNameForProperty($propertyName, 'get');
 		$propertySetterName = $this->getMethodNameForProperty($propertyName, 'set');
@@ -109,11 +109,10 @@ trait PropertyCheck {
 	 * @param  string $collectionItemType type of the items inside the collection
 	 * @return void
 	 */
-	protected function checkPropertyWithObjectCollectionType($propertyName, $collectionItemType) {
+	protected function checkPropertyWithObjectCollectionType($propertyName, $collectionItemType, $functionsToTest = array('get', 'set', 'add', 'remove')) {
 
 		// assert that methods exist
-		$this->assertGetterAndSetterExist($propertyName);
-		$this->assertAdderAndRemoverExist($propertyName);
+		$this->assertPropertyFunctionsExist($propertyName, $functionsToTest);
 
 		$item1 = new $collectionItemType();
 		$item2 = new $collectionItemType();
@@ -136,104 +135,134 @@ trait PropertyCheck {
 			'Class <' . get_class($this->fixture) . '> does not create a collection for property <' . $propertyName . '> right after creation'
 		);
 
-		// check chaining for adder while adding first item
-		$this->assertEquals(
-			$this->fixture,
-			$this->fixture->{$propertyAdderName}($item1),
-			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyAdderName . '()'
-		);
-		// works, so add second item
-		$this->fixture->{$propertyAdderName}($item2);
+		// check add + chaining
+		if ( in_array('add', $functionsToTest) ) {
 
-		// check add/get
-		$this->assertContains(
-			$item1,
-			$this->fixture->{$propertyGetterName}()
-		);
-		$this->assertContains(
-			$item2,
-			$this->fixture->{$propertyGetterName}()
-		);
-		$this->assertNotContains(
-			$item3,
-			$this->fixture->{$propertyGetterName}()
-		);
+			// check chaining
+			$this->assertEquals(
+				$this->fixture,
+				$this->fixture->{$propertyAdderName}($item1),
+				'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyAdderName . '()'
+			);
+			// works, so add second item
+			$this->fixture->{$propertyAdderName}($item2);
 
-		// check remove/get
-		$this->assertEquals(
-			$this->fixture,
-			$this->fixture->{$propertyRemoverName}($item2),
-			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyRemoverName . '()'
-		);
-		$this->assertContains(
-			$item1,
-			$this->fixture->{$propertyGetterName}()
-		);
-		$this->assertNotContains(
-			$item2,
-			$this->fixture->{$propertyGetterName}()
-		);
-		$this->assertNotContains(
-			$item3,
-			$this->fixture->{$propertyGetterName}()
-		);
+			// check add
+			$this->assertContains(
+				$item1,
+				$this->fixture->{$propertyGetterName}()
+			);
+			$this->assertContains(
+				$item2,
+				$this->fixture->{$propertyGetterName}()
+			);
+			$this->assertNotContains(
+				$item3,
+				$this->fixture->{$propertyGetterName}()
+			);
 
-		// check set/get
-		$this->assertEquals(
-			$this->fixture,
-			$this->fixture->{$propertySetterName}($itemCollection),
-			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertySetterName . '()'
-		);
-		$this->assertEquals(
-			$itemCollection,
-			$this->fixture->{$propertyGetterName}()
-		);
+		}
+
+		// check remove + chaining
+		if ( in_array('remove', $functionsToTest) ) {
+
+			// check chaining
+			$this->assertEquals(
+				$this->fixture,
+				$this->fixture->{$propertyRemoverName}($item2),
+				'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyRemoverName . '()'
+			);
+
+			// check remove
+			$this->assertContains(
+				$item1,
+				$this->fixture->{$propertyGetterName}()
+			);
+			$this->assertNotContains(
+				$item2,
+				$this->fixture->{$propertyGetterName}()
+			);
+			$this->assertNotContains(
+				$item3,
+				$this->fixture->{$propertyGetterName}()
+			);
+
+		}
+
+		// check set + chaining
+		if ( in_array('set', $functionsToTest) ) {
+
+			// check chaining
+			$this->assertEquals(
+				$this->fixture,
+				$this->fixture->{$propertySetterName}($itemCollection),
+				'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertySetterName . '()'
+			);
+
+			// check set
+			$this->assertEquals(
+				$itemCollection,
+				$this->fixture->{$propertyGetterName}()
+			);
+
+		}
 		
 	}
 
 	/**
 	 * asserts that the get- and set- methods exist
-	 * @param  string $propertyName name of the property
+	 * @param  string $propertyName   name of the property
+	 * @param  array $functionsToTest functions to test
 	 * @return void
 	 */
-	protected function assertGetterAndSetterExist($propertyName) {
-		// check if appropriate getter exists
-		$propertyGetterName =  $this->getMethodNameForProperty($propertyName, 'get');
-		$this->assertTrue(
-			method_exists($this->fixture, $propertyGetterName),
-			'Class <' . get_class($this->fixture) . '> has no getter for property <' . $propertyName . '>, tried ' . $propertyGetterName . '()'
-		);
-
-		// check if appropriate setter exists
-		$propertySetterName =  $this->getMethodNameForProperty($propertyName, 'set');
-		$this->assertTrue(
-			method_exists($this->fixture, $propertySetterName),
-			'Class <' . get_class($this->fixture) . '> has no setter for property <' . $propertyName . '>, tried ' . $propertySetterName . '($value)'
-		);
-	}
-
-	/**
-	 * asserts that the add- and remove- methods exist
-	 * @param  string $propertyName name of the property
-	 * @return void
-	 */
-	protected function assertAdderAndRemoverExist($propertyName) {
+	protected function assertPropertyFunctionsExist($propertyName, $functionsToTest) {
 
 		$singularPropertyName = PluralizerUtility::singular($propertyName);
 
-		// check if appropriate adder exists
-		$propertyAdderName = $this->getMethodNameForProperty($propertyName, 'add');
-		$this->assertTrue(
-			method_exists($this->fixture, $propertyAdderName),
-			'Class <' . get_class($this->fixture) . '> has no adder for property <' . $singularPropertyName . '>, tried ' . $propertyAdderName . '($' . $singularPropertyName . 'ToAdd)'
-		);
+		if ( in_array('get', $functionsToTest) ) {
 
-		// check if appropriate remover exists
-		$propertyRemoverName =  $this->getMethodNameForProperty($propertyName, 'remove');
-		$this->assertTrue(
-			method_exists($this->fixture, $propertyRemoverName),
-			'Class <' . get_class($this->fixture) . '> has no remover for property <' . $singularPropertyName . '>, tried ' . $propertyRemoverName . '($' . $singularPropertyName . 'ToRemove)'
-		);
+			// check if appropriate getter exists
+			$propertyGetterName =  $this->getMethodNameForProperty($propertyName, 'get');
+			$this->assertTrue(
+				method_exists($this->fixture, $propertyGetterName),
+				'Class <' . get_class($this->fixture) . '> has no getter for property <' . $propertyName . '>, tried ' . $propertyGetterName . '()'
+			);
+			
+		}
+
+		if ( in_array('set', $functionsToTest) ) {
+
+			// check if appropriate setter exists
+			$propertySetterName =  $this->getMethodNameForProperty($propertyName, 'set');
+			$this->assertTrue(
+				method_exists($this->fixture, $propertySetterName),
+				'Class <' . get_class($this->fixture) . '> has no setter for property <' . $propertyName . '>, tried ' . $propertySetterName . '($value)'
+			);
+			
+		}
+
+		if ( in_array('add', $functionsToTest) ) {
+
+			// check if appropriate adder exists
+			$propertyAdderName = $this->getMethodNameForProperty($propertyName, 'add');
+			$this->assertTrue(
+				method_exists($this->fixture, $propertyAdderName),
+				'Class <' . get_class($this->fixture) . '> has no adder for property <' . $singularPropertyName . '>, tried ' . $propertyAdderName . '($' . $singularPropertyName . 'ToAdd)'
+			);
+			
+		}
+
+		if ( in_array('remove', $functionsToTest) ) {
+
+			// check if appropriate remover exists
+			$propertyRemoverName =  $this->getMethodNameForProperty($propertyName, 'remove');
+			$this->assertTrue(
+				method_exists($this->fixture, $propertyRemoverName),
+				'Class <' . get_class($this->fixture) . '> has no remover for property <' . $singularPropertyName . '>, tried ' . $propertyRemoverName . '($' . $singularPropertyName . 'ToRemove)'
+			);
+
+		}
+
 	}
 
 	/**
