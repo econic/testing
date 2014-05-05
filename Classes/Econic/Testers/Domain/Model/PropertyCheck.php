@@ -16,23 +16,32 @@ trait PropertyCheck {
 	 * 
 	 * @param  string $propertyName the property name
 	 * @param  string $propertyType the property type: integer|boolean|float|string|array
-	 * @return [type]               [description]
+	 * @param  mixed $testValue     the value to test the setter with
+	 * @param  mixed $defaultValue  the value that's expected as default value
+	 * 
+	 * @return void
 	 */
-	protected function checkPropertyWithSimpleType($propertyName, $propertyType) {
+	protected function checkPropertyWithSimpleType($propertyName, $propertyType, $testValue = null, $defaultValue = null) {
 
-		$defaultValues = array(
-			'boolean' => true,
-			'integer' => 1,
-			'float' => 0.4,
-			'string' => 'abc',
-			'array' => array( 'foo', 'bar', 'baz')
-		);
+		if ( $testValue === null ) {
 
-		if (array_key_exists($propertyType, $defaultValues)) {
-			$this->checkSimplePropertyWithValue( $propertyName, $defaultValues[$propertyType] );
-		} else {
-			throw new \Exception('Unknown simple type: ' . $propertyType);
+			$defaultValues = array(
+				'boolean' => true,
+				'integer' => 1,
+				'float' => 0.4,
+				'string' => 'abc',
+				'array' => array( 'foo', 'bar', 'baz')
+			);
+
+			if (array_key_exists($propertyType, $defaultValues)) {
+				$testValue = $defaultValues[$propertyType];
+			} else {
+				throw new \Exception('Unknown simple type: ' . $propertyType);
+			}
+
 		}
+		
+		$this->checkSimplePropertyWithValue( $propertyName, $testValue, $defaultValue );
 
 	}
 
@@ -42,10 +51,16 @@ trait PropertyCheck {
 	 * 
 	 * @param  string $propertyName name of the property
 	 * @param  string $propertyType type of the property
+	 * @param  mixed $testValue     the value to test the setter with
+	 * @param  mixed $defaultValue  the value that's expected as default value
+	 * 
 	 * @return void
 	 */
-	protected function checkPropertyWithObjectType($propertyName, $propertyType) {
-		$this->checkSimplePropertyWithValue( $propertyName, new $propertyType() );
+	protected function checkPropertyWithObjectType($propertyName, $propertyType, $testValue = null, $defaultValue = null) {
+		if ( $testValue === null ) {
+			$testValue = new $propertyType();
+		}
+		$this->checkSimplePropertyWithValue( $propertyName, $testValue, $defaultValue );
 	}
 
 	/**
@@ -54,15 +69,23 @@ trait PropertyCheck {
 	 * 
 	 * @param  string $propertyName the property name
 	 * @param  mixed $value         the dummy value to test with
+	 * @param  mixed $defaultValue  the value that's expected as default value
 	 * @return void
 	 */
-	protected function checkSimplePropertyWithValue($propertyName, $value) {
+	protected function checkSimplePropertyWithValue($propertyName, $value, $defaultValue) {
 
 		// assert that methods exist
 		$this->assertGetterAndSetterExist($propertyName);
 
 		$propertyGetterName = $this->getMethodNameForProperty($propertyName, 'get');
 		$propertySetterName = $this->getMethodNameForProperty($propertyName, 'set');
+
+		// check default value with getter
+		$this->assertSame(
+			$defaultValue,
+			$this->fixture->{$propertyGetterName}(),
+			'Class <' . get_class($this->fixture) . '> does not have the default value for property <' . $propertyName . '>, tried ' . $propertySetterName . '()'
+		);
 
 		// check chaining while using setter
 		$this->assertSame(
