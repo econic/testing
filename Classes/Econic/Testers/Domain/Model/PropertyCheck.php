@@ -91,7 +91,7 @@ trait PropertyCheck {
 		$this->assertSame(
 			$this->fixture,
 			$this->fixture->{$propertySetterName}($value),
-			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertySetterName.'()'
+			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertySetterName . '()'
 		);
 
 		// check set/get
@@ -140,7 +140,7 @@ trait PropertyCheck {
 		$this->assertEquals(
 			$this->fixture,
 			$this->fixture->{$propertyAdderName}($item1),
-			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyAdderName.'()'
+			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyAdderName . '()'
 		);
 		// works, so add second item
 		$this->fixture->{$propertyAdderName}($item2);
@@ -163,7 +163,7 @@ trait PropertyCheck {
 		$this->assertEquals(
 			$this->fixture,
 			$this->fixture->{$propertyRemoverName}($item2),
-			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyRemoverName.'()'
+			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertyRemoverName . '()'
 		);
 		$this->assertContains(
 			$item1,
@@ -182,7 +182,7 @@ trait PropertyCheck {
 		$this->assertEquals(
 			$this->fixture,
 			$this->fixture->{$propertySetterName}($itemCollection),
-			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertySetterName.'()'
+			'Class <' . get_class($this->fixture) . '> does not enable chaining for property <' . $propertyName . '>, tried ' . $propertySetterName . '()'
 		);
 		$this->assertEquals(
 			$itemCollection,
@@ -201,14 +201,14 @@ trait PropertyCheck {
 		$propertyGetterName =  $this->getMethodNameForProperty($propertyName, 'get');
 		$this->assertTrue(
 			method_exists($this->fixture, $propertyGetterName),
-			'Class <' . get_class($this->fixture) . '> has no getter for property <' . $propertyName . '>, tried ' . $propertyGetterName.'()'
+			'Class <' . get_class($this->fixture) . '> has no getter for property <' . $propertyName . '>, tried ' . $propertyGetterName . '()'
 		);
 
 		// check if appropriate setter exists
 		$propertySetterName =  $this->getMethodNameForProperty($propertyName, 'set');
 		$this->assertTrue(
 			method_exists($this->fixture, $propertySetterName),
-			'Class <' . get_class($this->fixture) . '> has no getter for property <' . $propertyName . '>, tried ' . $propertySetterName.'($value)'
+			'Class <' . get_class($this->fixture) . '> has no getter for property <' . $propertyName . '>, tried ' . $propertySetterName . '($value)'
 		);
 	}
 
@@ -225,14 +225,14 @@ trait PropertyCheck {
 		$propertyAdderName = $this->getMethodNameForProperty($propertyName, 'add');
 		$this->assertTrue(
 			method_exists($this->fixture, $propertyAdderName),
-			'Class <' . get_class($this->fixture) . '> has no adder for property <' . $singularPropertyName . '>, tried ' . $propertyAdderName.'($' . $singularPropertyName . 'ToAdd)'
+			'Class <' . get_class($this->fixture) . '> has no adder for property <' . $singularPropertyName . '>, tried ' . $propertyAdderName . '($' . $singularPropertyName . 'ToAdd)'
 		);
 
 		// check if appropriate remover exists
 		$propertyRemoverName =  $this->getMethodNameForProperty($propertyName, 'remove');
 		$this->assertTrue(
 			method_exists($this->fixture, $propertyRemoverName),
-			'Class <' . get_class($this->fixture) . '> has no remover for property <' . $singularPropertyName . '>, tried ' . $propertyRemoverName.'($' . $singularPropertyName . 'ToRemove)'
+			'Class <' . get_class($this->fixture) . '> has no remover for property <' . $singularPropertyName . '>, tried ' . $propertyRemoverName . '($' . $singularPropertyName . 'ToRemove)'
 		);
 	}
 
