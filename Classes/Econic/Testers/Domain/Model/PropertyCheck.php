@@ -84,7 +84,7 @@ trait PropertyCheck {
 		$this->assertSame(
 			$defaultValue,
 			$this->fixture->{$propertyGetterName}(),
-			'Class <' . get_class($this->fixture) . '> does not have the default value for property <' . $propertyName . '>, tried ' . $propertySetterName . '()'
+			'Class <' . get_class($this->fixture) . '> does not have the correct default value for property <' . $propertyName . '>, tried ' . $propertyGetterName . '()'
 		);
 
 		// check chaining while using setter
