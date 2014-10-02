@@ -1,12 +1,11 @@
 <?php
 namespace Econic\Testers\Domain\Model;
 
-use TYPO3\Flow\Annotations as Flow;
 use Doctrine\Common\Collections\ArrayCollection;
 use Econic\Testers\Utility\PluralizerUtility;
 
 /**
- * Tester class for testing Model/Entity related things
+ * Tester trait for testing Model/Entity related things
  */
 trait PropertyCheck {
 
@@ -289,4 +288,3 @@ trait PropertyCheck {
 	}
 
 }
-?>
