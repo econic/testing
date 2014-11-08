@@ -1,4 +1,4 @@
-<?php namespace Econic\Testers\Utility;
+<?php namespace Econic\Testing\Utility;
 /*
  * Class taken from https://github.com/illuminate/support
  *

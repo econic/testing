@@ -1,8 +1,8 @@
 <?php
-namespace Econic\Testers\Domain\Model;
+namespace Econic\Testing\Domain\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Econic\Testers\Utility\PluralizerUtility;
+use Econic\Testing\Utility\PluralizerUtility;
 
 /**
  * Tester trait for testing Model/Entity related things
