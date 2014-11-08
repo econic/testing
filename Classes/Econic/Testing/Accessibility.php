@@ -1,5 +1,5 @@
 <?php
-namespace Econic\Testing\Domain\Model;
+namespace Econic\Testing;
 
 use TYPO3\Flow\Reflection\ObjectAccess;
 
