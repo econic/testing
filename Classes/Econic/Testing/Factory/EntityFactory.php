@@ -67,7 +67,11 @@ class EntityFactory {
 
 					// a datetime
 					case 'DateTime':
-						$propertyValue = new \DateTime();
+						if (!empty($propertyValue['time'])) {
+							$propertyValue = new \DateTime( $propertyValue['time'] );
+						} else {
+							$propertyValue = new \DateTime();
+						}
 						break;
 
 					// unknown type, throw exception
