@@ -28,14 +28,14 @@ class EntityFactory {
 	protected $persistenceManager;
 
 	/**
-	 * @Flow\Inject
 	 * @var \TYPO3\Flow\Mvc\Controller\MvcPropertyMappingConfigurationService
+	 * @Flow\Inject
 	 */
 	protected $mvcPropertyMappingConfigurationService;
 
 	/**
-	 * @Flow\Inject
 	 * @var \TYPO3\Flow\Security\Context
+	 * @Flow\Inject
 	 */
 	protected $securityContext;
 
@@ -50,43 +50,25 @@ class EntityFactory {
 	public function create($fqcn, $persist = false, $customProperties = array()) {
 
 		$entityConfiguration = $this->entityConfiguration[ $fqcn ];
-		$entity = new $fqcn();
+
+		// create from reflection class if constructor needs arguments
+		if (!empty($entityConfiguration['constructorArguments'])) {
+			$reflector = new \ReflectionClass( $fqcn );
+			$constructorArguments = $this->getValuesFromConfigurations( $entityConfiguration['constructorArguments'] );
+			$entity = $reflector->newInstanceArgs($constructorArguments);
+		} else {
+			$entity = new $fqcn();
+		}
 
 		// set the properties
-		$properties = array_merge( $entityConfiguration['properties'], $customProperties );
-		foreach ($properties as $propertyName => $propertyValue) {
-
-			// if it's an array and the __type is set, do fancy things...
-			if (is_array($propertyValue) && !empty($propertyValue['__type'])) {
-				switch ($propertyValue['__type']) {
-
-					// another entity
-					case 'Entity':
-						$propertyValue = $this->create($propertyValue['fqcn'], $persist);
-						break;
-
-					// a datetime
-					case 'DateTime':
-						if (!empty($propertyValue['time'])) {
-							$propertyValue = new \DateTime( $propertyValue['time'] );
-						} else {
-							$propertyValue = new \DateTime();
-						}
-						break;
-
-					// unknown type, throw exception
-					default:
-						throw new \Exception('type <' . $propertyValue['__type'] . '> of ' . $fqcn . '::' . $propertyName . ' is unknown', 1415281345);
-						break;
-				}
-			}
-			
-			// set the value
+		$configuredProperties = $entityConfiguration['properties'] ?: array();
+		$properties = array_merge( $configuredProperties, $customProperties );
+		foreach ($this->getValuesFromConfigurations($properties, $persist) as $propertyName => $propertyValue) {
 			ObjectAccess::setProperty( $entity, $propertyName, $propertyValue );
 		}
 
 		// persist if wished
-		if ($persist) {
+		if ($persist && !empty($entityConfiguration['repository'])) {
 			$this->objectManager->get( $entityConfiguration['repository'] )->add( $entity );
 			$this->persistenceManager->persistAll();
 		}
@@ -95,17 +77,65 @@ class EntityFactory {
 	}
 
 	/**
+	 * Returns the final values from a given configuration
+	 * 
+	 * @param  array   $propertyConfigurations array with name => config
+	 * @param  boolean $persistCreatedEntities if entities that must be created should be directly persisted
+	 * @return array   name => value
+	 */
+	protected function getValuesFromConfigurations($propertyConfigurations, $persistCreatedEntities = false) {
+		$properties = array();
+		foreach ($propertyConfigurations as $propertyName => $propertyConfiguration) {
+
+			// if it's an array and the __type is set, do fancy things...
+			if (is_array($propertyConfiguration) && !empty($propertyConfiguration['__type'])) {
+				switch ($propertyConfiguration['__type']) {
+
+					// another entity
+					case 'Entity':
+						$properties[$propertyName] = $this->create($propertyConfiguration['fqcn'], $persistCreatedEntities);
+						break;
+
+					// a sha1 hash
+					case 'sha1':
+						$properties[$propertyName] = sha1(rand());
+						break;
+
+					// a datetime
+					case 'DateTime':
+						if (!empty($propertyConfiguration['time'])) {
+							$properties[$propertyName] = new \DateTime( $propertyConfiguration['time'] );
+						} else {
+							$properties[$propertyName] = new \DateTime();
+						}
+						break;
+
+					// unknown type, throw exception
+					default:
+						throw new \Exception('type <' . $propertyConfiguration['__type'] . '> of ' . $fqcn . '::' . $propertyName . ' is unknown', 1415281345);
+						break;
+				}
+			}
+			// otherwise just assign the value
+			else {
+				$properties[$propertyName] = $propertyConfiguration;
+			}
+		}
+		return $properties;
+	}
+
+	/**
 	 * Creates an entity as an array that you can submit as if you used a form
 	 * 
 	 * @param  array   $string           argument name
 	 * @param  array   $fqcn             the fully qualified class name
 	 * @param  array   $customProperties the properties to set if wished
-	 * @return array
+	 * @return array  the argument you can then submit
 	 */
-	public function getSubmittableArray($argumentName, $fqcn, $customProperties = array()) {
+	public function getSubmitArgumentsForNewEntity($argumentName, $fqcn, $customProperties = array()) {
 
 		$entityConfiguration = $this->entityConfiguration[ $fqcn ];
-		$array = array( $argumentName => array() );
+		$arguments = array( $argumentName => array() );
 		$propertyNamesForMappingService = array();
 
 		// set the properties
@@ -116,7 +146,7 @@ class EntityFactory {
 			if (is_array($propertyValue) && !empty($propertyValue['__type'])) {
 				// ignore property
 			} else {
-				$array[ $argumentName ][ $propertyName ] = $propertyValue;
+				$arguments[ $argumentName ][ $propertyName ] = $propertyValue;
 				$propertyNamesForMappingService[] = $argumentName . '[' . $propertyName . ']';
 			}
 		}
@@ -124,19 +154,53 @@ class EntityFactory {
 		$propertyNamesForMappingService[] = '';
 
 		// add __trustedProperties
-		$array[ '__trustedProperties' ] = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken($propertyNamesForMappingService, '');
+		$arguments[ '__trustedProperties' ] = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken($propertyNamesForMappingService, '');
 
 		// add __csrfToken
-		// $array[ '__csrfToken' ] = $this->securityContext->getCsrfProtectionToken();
+		// $arguments[ '__csrfToken' ] = $this->securityContext->getCsrfProtectionToken();
 
-		return $array;
+		return $arguments;
 	}
 
-	public function getSubmittableArrayFromPersistedEntity($argumentName, $existingEntity, $customProperties = array()) {
-		return $this->getSubmittableArray(
-			$argumentName,
-			get_class($existingEntity),
-			array('__identity' => $this->persistenceManager->getIdentifierByObject($existingEntity)) + $customProperties
+	/**
+	 * Creates an entity as an array that you can submit as if you used a form
+	 * 
+	 * @param  string $argumentName     the name
+	 * @param  Object $persistedEntity  the Entity that you'd like to create this argument from
+	 * @param  array  $customProperties the properties to set if wished
+	 * @return array  the argument you can then submit
+	 */
+	public function getSubmitArgumentsForPersistedEntity($argumentName, $persistedEntity, $customProperties = array()) {
+
+		$arguments = array( $argumentName => $this->getIdentityArgumentFromPersistedEntity($persistedEntity) );
+		$propertyNamesForMappingService = array($argumentName.'[__identity]');
+
+		// set the properties
+		foreach ($customProperties as $propertyName => $propertyValue) {
+			$arguments[ $argumentName ][ $propertyName ] = $propertyValue;
+			$propertyNamesForMappingService[] = $argumentName . '[' . $propertyName . ']';
+		}
+
+		$propertyNamesForMappingService[] = '';
+
+		// add __trustedProperties
+		$arguments[ '__trustedProperties' ] = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken($propertyNamesForMappingService, '');
+
+		// add __csrfToken
+		// $arguments[ '__csrfToken' ] = $this->securityContext->getCsrfProtectionToken();
+
+		return $arguments;
+	}
+
+	/**
+	 * Returns an array with an __identity entry for submitting somewhere
+	 * 
+	 * @param  Object $persistedEntity the Entity you want to submit
+	 * @return array  the argument you can then submit
+	 */
+	public function getIdentityArgumentFromPersistedEntity($persistedEntity) {
+		return array(
+			'__identity' => $this->persistenceManager->getIdentifierByObject($persistedEntity)
 		);
 	}
 
