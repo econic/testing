@@ -59,6 +59,8 @@ abstract class ControllerTest extends Test {
 		// create relative uri
 		switch ($method) {
 			case 'GET':
+
+				// build uri
 				$uri = $this->buildAbsoluteUri(
 					$this->uriBuilder->uriFor(
 						$actionName,
@@ -68,10 +70,14 @@ abstract class ControllerTest extends Test {
 						$this->subpackageKey
 					)
 				);
+
+				// send post request
 				$reponse = $this->browser->request( $uri, $method, array(), $files, $server, $content );
 				break;
 
 			case 'POST':
+
+				// build uri
 				$uri = $this->buildAbsoluteUri(
 					$this->uriBuilder->uriFor(
 						$actionName,
@@ -81,7 +87,19 @@ abstract class ControllerTest extends Test {
 						$this->subpackageKey
 					)
 				);
-				$reponse = $this->browser->request( $uri, $method, $arguments, $files, $server, $content );
+
+				// convert entities to identity arguments, because the browser only accepts simple types in a post request
+				$convertedArguments = array();
+				foreach ($arguments as $argumentName => $argumentValue) {
+					if (is_object($argumentValue)) {
+						$convertedArguments[$argumentName] = $this->entityFactory->getIdentityArgumentFromPersistedEntity($argumentValue);
+					} else {
+						$convertedArguments[$argumentName] = $argumentValue;
+					}
+				}
+
+				// send post request
+				$reponse = $this->browser->request( $uri, $method, $convertedArguments, $files, $server, $content );
 				break;
 
 			default:
