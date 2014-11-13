@@ -55,4 +55,13 @@ class ResponseProxy {
 		return $this;
 	}
 
+	public function equals($string) {
+		$this->test->assertSame(
+			$string,
+			$this->response->getContent(),
+			'The Response did not equal the string <' . $string . '>'
+		);
+		return $this;
+	}
+
 }
