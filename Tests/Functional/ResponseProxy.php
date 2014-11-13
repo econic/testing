@@ -50,7 +50,7 @@ class ResponseProxy {
 		$this->test->assertContains(
 			$string,
 			$this->response->getContent(),
-			'The Response did not contain the test string <' . $string . '>'
+			'The Response did not contain the string <' . $string . '>'
 		);
 		return $this;
 	}
@@ -61,6 +61,11 @@ class ResponseProxy {
 			$this->response->getContent(),
 			'The Response did not equal the string <' . $string . '>'
 		);
+		return $this;
+	}
+
+	public function debug() {
+		\TYPO3\Flow\var_dump($this->response);
 		return $this;
 	}
 
