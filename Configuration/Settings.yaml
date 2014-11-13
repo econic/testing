@@ -1,0 +1,35 @@
+Econic:
+  Testing:
+    entityConfiguration:
+      TYPO3\Flow\Resource\Resource:
+        properties:
+          resourcePointer:
+            __type: Entity
+            fqcn: TYPO3\Flow\Resource\ResourcePointer
+        repository: false
+      TYPO3\Flow\Resource\ResourcePointer:
+        properties: false
+        constructorArguments:
+          hash:
+            __type: sha1
+        repository: false
+      TYPO3\Flow\Security\Account:
+        properties:
+        repository: false
+      TYPO3\Flow\Security\Policy\Role:
+        properties:
+      TYPO3\Party\Domain\Model\ElectronicAddress:
+        properties:
+          identifier: 123456789
+          type: Icq
+        repository: false
+      TYPO3\Party\Domain\Model\Person:
+        properties:
+          name:
+            __type: Entity
+            fqcn: TYPO3\Party\Domain\Model\PersonName
+        repository: false
+      TYPO3\Party\Domain\Model\PersonName:
+        properties:
+          title: some Title
+        repository: false
