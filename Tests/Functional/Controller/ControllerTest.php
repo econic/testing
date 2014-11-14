@@ -16,12 +16,12 @@ abstract class ControllerTest extends Test {
 	protected $subpackageKey;
 	protected $controllerName;
 
-	protected $request_subdomain = null;
-	protected $request_method = 'GET';
-	protected $request_uri = '/';
-	protected $request_port = '80';
 	protected $request_protocol = 'http:';
+	protected $request_port = '80';
+	protected $request_method = 'GET';
+	protected $request_subdomain = null;
 	protected $request_domain = 'localhost';
+	protected $request_uri = '/';
 
 	protected $testableSecurityEnabled = true;
 	static protected $testablePersistenceEnabled = true;
@@ -153,8 +153,9 @@ abstract class ControllerTest extends Test {
 		$this->referringRequest = (new \TYPO3\Flow\Http\Request( array(), array(), array(), $serverConfiguration ))->createActionRequest();
 	}
 
-	protected function buildAbsoluteUri($relativeUri) {
-		return $this->request_protocol . '//' . $this->request_subdomain . '.' . $this->request_domain . $relativeUri;
+	protected function buildAbsoluteUri($relativeUri = '') {
+		$subdomainPart = $this->request_subdomain ? $this->request_subdomain.'.' : '';
+		return $this->request_protocol . '//' . $subdomainPart . $this->request_domain . $relativeUri;
 	}
 
 }
