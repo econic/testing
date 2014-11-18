@@ -122,7 +122,7 @@ abstract class ControllerTest extends Test {
 			'REQUEST_URI' => $this->request_uri,
 			'SERVER_PORT' => $this->request_port,
 
-			'REDIRECT_FLOW_CONTEXT' => 'Development',
+			'REDIRECT_FLOW_CONTEXT' => 'Testing',
 			'REDIRECT_FLOW_REWRITEURLS' => '1',
 			'REDIRECT_STATUS' => '200',
 			'FLOW_CONTEXT' => 'Testing',
