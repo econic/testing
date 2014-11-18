@@ -43,13 +43,15 @@ class EntityFactory {
 	 * Mocks an entity as wished
 	 * 
 	 * @param  array   $fqcn             the fully qualified class name
-	 * @param  boolean $persist          if the entity should be persisted or not
+	 * @param  boolean $persist          if the entity should be directly persisted or not
 	 * @param  array   $customProperties the properties to set if wished
 	 * @return Object
 	 */
 	public function create($fqcn, $persist = false, $customProperties = array()) {
 
 		$entityConfiguration = $this->entityConfiguration[ $fqcn ];
+
+		$this->validateEntityConfiguration($entityConfiguration);
 
 		// create from reflection class if constructor needs arguments
 		if (!empty($entityConfiguration['constructorArguments'])) {
@@ -68,12 +70,24 @@ class EntityFactory {
 		}
 
 		// persist if wished
-		if ($persist && !empty($entityConfiguration['repository'])) {
+		if ( $persist && is_string($entityConfiguration['repository']) ) {
 			$this->objectManager->get( $entityConfiguration['repository'] )->add( $entity );
 			$this->persistenceManager->persistAll();
 		}
 
 		return $entity;
+	}
+
+	/**
+	 * Validates the configuration and throws exceptions if invalid
+	 * 
+	 * @param  array $entityConfiguration the entity configuration
+	 * @return void
+	 */
+	protected function validateEntityConfiguration($entityConfiguration) {
+		if ( !isset($entityConfiguration['repository']) ) {
+			throw new \Exception('The entity of type ' . $fqcn . ' has no repository defined', 1416225586);
+		}
 	}
 
 	/**
