@@ -22,6 +22,12 @@ class EntityFactory {
 	protected $objectManager;
 
 	/**
+	 * @var \Doctrine\Common\Persistence\ObjectManager
+	 * @Flow\Inject
+	 */
+	protected $entityManager;
+
+	/**
 	 * @var \TYPO3\Flow\Persistence\PersistenceManagerInterface
 	 * @Flow\Inject
 	 */
@@ -72,7 +78,9 @@ class EntityFactory {
 		// persist if wished
 		if ( $persist && is_string($entityConfiguration['repository']) ) {
 			$this->objectManager->get( $entityConfiguration['repository'] )->add( $entity );
-			$this->persistenceManager->persistAll();
+
+			// flush this entity here...
+			$this->entityManager->flush($entity);
 		}
 
 		return $entity;
