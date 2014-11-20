@@ -187,7 +187,7 @@ class EntityFactory {
 		$arguments[ '__trustedProperties' ] = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken($propertyNamesForMappingService, '');
 
 		// add __csrfToken
-		// $arguments[ '__csrfToken' ] = $this->securityContext->getCsrfProtectionToken();
+		$arguments[ '__csrfToken' ] = $this->securityContext->getCsrfProtectionToken();
 
 		return $arguments;
 	}
@@ -217,7 +217,7 @@ class EntityFactory {
 		$arguments[ '__trustedProperties' ] = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken($propertyNamesForMappingService, '');
 
 		// add __csrfToken
-		// $arguments[ '__csrfToken' ] = $this->securityContext->getCsrfProtectionToken();
+		$arguments[ '__csrfToken' ] = $this->securityContext->getCsrfProtectionToken();
 
 		return $arguments;
 	}
