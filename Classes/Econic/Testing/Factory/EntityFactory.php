@@ -243,4 +243,12 @@ class EntityFactory {
 		}
 	}
 
+	public function refreshEntity($entity) {
+		if (!in_array($entity, $this->managedEntities)) {
+			throw new \Exception('The entity to be refreshed is not handled by the entity factory', 1416484011);
+		}
+
+		$this->entityManager->refresh($entity);
+	}
+
 }
