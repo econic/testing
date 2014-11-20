@@ -49,6 +49,9 @@ abstract class ControllerTest extends Test {
 	}
 
 	protected function request($actionName, $method = 'GET', array $arguments = array(), array $files = array(), array $server = array(), $content = NULL) {
+		// refresh all entities from persistence as if they were created in a previous request
+		$this->entityFactory->refreshAllEntities();
+
 		$this->buildReferringRequest();
 
 		// initialize uri builder
