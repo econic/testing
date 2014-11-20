@@ -78,7 +78,10 @@ class EntityFactory {
 		$configuredProperties = $entityConfiguration['properties'] ?: array();
 		$properties = array_merge( $configuredProperties, $customProperties );
 		foreach ($this->getValuesFromConfigurations($properties, $persist) as $propertyName => $propertyValue) {
-			ObjectAccess::setProperty( $entity, $propertyName, $propertyValue );
+			$propertyCouldBeSet = ObjectAccess::setProperty( $entity, $propertyName, $propertyValue );
+			if (!$propertyCouldBeSet) {
+				throw new \Exception($fqcn.'::$'.$propertyName.' could not be set to '.print_r($propertyValue, true), 1416481470);
+			}
 		}
 
 		// persist if wished
