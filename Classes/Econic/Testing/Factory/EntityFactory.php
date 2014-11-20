@@ -237,4 +237,10 @@ class EntityFactory {
 		);
 	}
 
+	public function refreshAllEntities() {
+		foreach ($this->managedEntities as $identifier => $entity) {
+			$this->entityManager->refresh($entity);
+		}
+	}
+
 }
