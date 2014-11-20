@@ -3,6 +3,7 @@ namespace Econic\Testing\Tester;
 
 use TYPO3\Flow\Annotations as Flow;
 use Econic\Testing\Tests\Functional\Test;
+use TYPO3\Flow\Reflection\ObjectAccess;
 
 /**
  * Testing class to make presistence related assertions
@@ -19,6 +20,12 @@ class PersistenceTester {
 	 * @Flow\Inject
 	 */
 	protected $objectManager;
+
+	/**
+	 * @var \Doctrine\Common\Persistence\ObjectManager
+	 * @Flow\Inject
+	 */
+	protected $entityManager;
 
 	/**
 	 * @var \TYPO3\Flow\Persistence\PersistenceManagerInterface
@@ -68,20 +75,28 @@ class PersistenceTester {
 		return $this;
 	}
 
-	public function assertPersistedProperty($entity, $propertyName, $expectedPropertyValue = null) {
-		if ($expectedPropertyValue === null) {
-			$this->test->assertTrue(
-				$this->persistenceSession->isDirty( $entity, $propertyName ),
-				'The property ' . $propertyName . ' is not persisted'
-			);
-		} else {
-			$realPropertyValue = $this->persistenceSession->getCleanStateOfProperty( $entity, $propertyName );
-			$this->test->assertSame(
-				$realPropertyValue,
-				$expectedPropertyValue,
-				'The value of property ' . $propertyName . ' is ' . $realPropertyValue . ' instead of ' . $expectedPropertyValue
-			);
-		}
+	public function assertCleanProperty($entity, $propertyName) {
+		$currentPropertyValue = ObjectAccess::getPropertyValue($entity, $propertyName);
+		$this->entityManager->refresh($entity);
+		$persistedPropertyValue = ObjectAccess::getPropertyValue($entity, $propertyName);
+
+		$this->test->assertSame(
+			$currentPropertyValue,
+			$persistedPropertyValue,
+			'The property ' . $propertyName . ' was not clean'
+		);
+		return $this;
+	}
+
+	public function assertPersistedPropertyValue($entity, $propertyName, $expectedPropertyValue) {
+		$this->entityManager->refresh($entity);
+		$persistedPropertyValue = ObjectAccess::getPropertyValue($entity, $propertyName);
+
+		$this->test->assertSame(
+			$expectedPropertyValue,
+			$persistedPropertyValue,
+			'The property ' . $propertyName . ' did not have the expected persistent value'
+		);
 		return $this;
 	}
 
