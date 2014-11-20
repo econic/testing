@@ -46,6 +46,12 @@ class EntityFactory {
 	protected $securityContext;
 
 	/**
+	 * All entities that are created by this factory
+	 * @var array
+	 */
+	protected $managedEntities = array();
+
+	/**
 	 * Mocks an entity as wished
 	 * 
 	 * @param  array   $fqcn             the fully qualified class name
@@ -83,6 +89,8 @@ class EntityFactory {
 			$this->entityManager->flush($entity);
 		}
 
+		$identifier = $this->persistenceManager->getIdentifierByObject($entity);
+		$this->managedEntities[ $identifier ] = $entity;
 		return $entity;
 	}
 
