@@ -160,16 +160,17 @@ class EntityFactory {
 	/**
 	 * Creates an entity as an array that you can submit as if you used a form
 	 * 
-	 * @param  array   $string           argument name
-	 * @param  array   $fqcn             the fully qualified class name
-	 * @param  array   $customProperties the properties to set if wished
+	 * @param  array   $string                      argument name
+	 * @param  array   $fqcn                        the fully qualified class name
+	 * @param  array   $customProperties            the properties to set if wished
+	 * @param  array   $additionalTrustedProperties more properties to be trusted
 	 * @return array  the argument you can then submit
 	 */
-	public function getSubmitArgumentsForNewEntity($argumentName, $fqcn, $customProperties = array()) {
+	public function getSubmitArgumentsForNewEntity($argumentName, $fqcn, $customProperties = array(), $additionalTrustedProperties = array()) {
 
 		$entityConfiguration = $this->entityConfiguration[ $fqcn ];
 		$arguments = array( $argumentName => array() );
-		$propertyNamesForMappingService = array();
+		$propertyNamesForMappingService = $additionalTrustedProperties;
 
 		// set the properties
 		$properties = array_merge( $entityConfiguration['properties'], $customProperties );
@@ -198,15 +199,16 @@ class EntityFactory {
 	/**
 	 * Creates an entity as an array that you can submit as if you used a form
 	 * 
-	 * @param  string $argumentName     the name
-	 * @param  Object $persistedEntity  the Entity that you'd like to create this argument from
-	 * @param  array  $customProperties the properties to set if wished
+	 * @param  string $argumentName                the name
+	 * @param  Object $persistedEntity             the Entity that you'd like to create this argument from
+	 * @param  array  $customProperties            the properties to set if wished
+	 * @param  array  $additionalTrustedProperties more properties to be trusted
 	 * @return array  the argument you can then submit
 	 */
-	public function getSubmitArgumentsForPersistedEntity($argumentName, $persistedEntity, $customProperties = array()) {
+	public function getSubmitArgumentsForPersistedEntity($argumentName, $persistedEntity, $customProperties = array(), $additionalTrustedProperties = array()) {
 
 		$arguments = array( $argumentName => $this->getIdentityArgumentFromPersistedEntity($persistedEntity) );
-		$propertyNamesForMappingService = array($argumentName.'[__identity]');
+		$propertyNamesForMappingService = array($argumentName.'[__identity]') + $additionalTrustedProperties;
 
 		// set the properties
 		foreach ($customProperties as $propertyName => $propertyValue) {
