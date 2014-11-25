@@ -251,4 +251,8 @@ class EntityFactory {
 		$this->entityManager->refresh($entity);
 	}
 
+	public function flushEntity($entity) {
+		$this->entityManager->flush($entity);
+	}
+
 }
