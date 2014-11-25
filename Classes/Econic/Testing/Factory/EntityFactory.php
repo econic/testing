@@ -63,7 +63,7 @@ class EntityFactory {
 
 		$entityConfiguration = $this->entityConfiguration[ $fqcn ];
 
-		$this->validateEntityConfiguration($entityConfiguration);
+		$this->validateEntityConfiguration($fqcn, $entityConfiguration);
 
 		// create from reflection class if constructor needs arguments
 		if (!empty($entityConfiguration['constructorArguments'])) {
@@ -100,10 +100,11 @@ class EntityFactory {
 	/**
 	 * Validates the configuration and throws exceptions if invalid
 	 * 
+	 * @param  array $fqcn                the fully qualified class name
 	 * @param  array $entityConfiguration the entity configuration
 	 * @return void
 	 */
-	protected function validateEntityConfiguration($entityConfiguration) {
+	protected function validateEntityConfiguration($fqcn, $entityConfiguration) {
 		if ( !isset($entityConfiguration['repository']) ) {
 			throw new \Exception('The entity of type ' . $fqcn . ' has no repository defined', 1416225586);
 		}
