@@ -75,10 +75,10 @@ class PersistenceTester {
 		return $this;
 	}
 
-	public function assertCleanProperty($entity, $propertyName) {
-		$currentPropertyValue = ObjectAccess::getPropertyValue($entity, $propertyName);
+	public function assertCleanProperty($entity, $propertyName, $forceDirectAccess = true) {
+		$currentPropertyValue = ObjectAccess::getProperty($entity, $propertyName, $forceDirectAccess);
 		$this->entityManager->refresh($entity);
-		$persistedPropertyValue = ObjectAccess::getPropertyValue($entity, $propertyName);
+		$persistedPropertyValue = ObjectAccess::getProperty($entity, $propertyName, $forceDirectAccess);
 
 		$this->test->assertSame(
 			$currentPropertyValue,
@@ -88,9 +88,9 @@ class PersistenceTester {
 		return $this;
 	}
 
-	public function assertPersistedPropertyValue($entity, $propertyName, $expectedPropertyValue) {
+	public function assertPersistedPropertyValue($entity, $propertyName, $expectedPropertyValue, $forceDirectAccess = true) {
 		$this->entityManager->refresh($entity);
-		$persistedPropertyValue = ObjectAccess::getPropertyValue($entity, $propertyName);
+		$persistedPropertyValue = ObjectAccess::getProperty($entity, $propertyName, $forceDirectAccess);
 
 		$this->test->assertSame(
 			$expectedPropertyValue,
