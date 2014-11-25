@@ -100,4 +100,8 @@ class PersistenceTester {
 		return $this;
 	}
 
+	public function findAllOfType($fqcn) {
+		return $this->objectManager->get( $this->entityConfiguration[ $fqcn ][ 'repository' ] )->findAll();
+	}
+
 }
