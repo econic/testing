@@ -55,6 +55,15 @@ class ResponseProxy {
 		return $this;
 	}
 
+	public function notContains($string) {
+		$this->test->assertNotContains(
+			$string,
+			$this->response->getContent(),
+			'The Response contained the disallowed string <' . $string . '>'
+		);
+		return $this;
+	}
+
 	public function equals($string) {
 		$this->test->assertSame(
 			$string,
