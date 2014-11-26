@@ -54,13 +54,12 @@ class EntityFactory {
 	/**
 	 * Mocks an entity as wished
 	 * 
-	 * @param  array   $fqcn             the fully qualified class name
+	 * @param  string  $fqcn             the fully qualified class name
 	 * @param  boolean $persist          if the entity should be directly persisted or not
 	 * @param  array   $customProperties the properties to set if wished
 	 * @return Object
 	 */
 	public function create($fqcn, $persist = false, $customProperties = array()) {
-
 		$entityConfiguration = $this->entityConfiguration[ $fqcn ];
 
 		$this->validateEntityConfiguration($fqcn, $entityConfiguration);
@@ -100,8 +99,8 @@ class EntityFactory {
 	/**
 	 * Validates the configuration and throws exceptions if invalid
 	 * 
-	 * @param  array $fqcn                the fully qualified class name
-	 * @param  array $entityConfiguration the entity configuration
+	 * @param  string $fqcn                the fully qualified class name
+	 * @param  array  $entityConfiguration the entity configuration
 	 * @return void
 	 */
 	protected function validateEntityConfiguration($fqcn, $entityConfiguration) {
@@ -161,8 +160,8 @@ class EntityFactory {
 	/**
 	 * Creates an entity as an array that you can submit as if you used a form
 	 * 
-	 * @param  array   $string                      argument name
-	 * @param  array   $fqcn                        the fully qualified class name
+	 * @param  string  $argumentName                argument name
+	 * @param  string  $fqcn                        the fully qualified class name
 	 * @param  array   $customProperties            the properties to set if wished
 	 * @param  array   $additionalTrustedProperties more properties to be trusted
 	 * @return array  the argument you can then submit
