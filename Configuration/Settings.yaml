@@ -15,6 +15,8 @@ Econic:
         repository: false
       TYPO3\Flow\Security\Account:
         properties:
+          accountIdentifier: 'test@testi.ng'
+          authenticationProviderName: 'PersistedUsernamePasswordProvider'
         repository: false
       TYPO3\Flow\Security\Policy\Role:
         properties:
