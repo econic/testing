@@ -89,10 +89,12 @@ class EntityFactory {
 
 			// flush this entity here...
 			$this->entityManager->flush($entity);
+
+			// add to managed entities
+			$identifier = $this->persistenceManager->getIdentifierByObject($entity);
+			$this->managedEntities[ $identifier ] = $entity;
 		}
 
-		$identifier = $this->persistenceManager->getIdentifierByObject($entity);
-		$this->managedEntities[ $identifier ] = $entity;
 		return $entity;
 	}
 
