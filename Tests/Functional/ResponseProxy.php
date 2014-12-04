@@ -3,6 +3,7 @@ namespace Econic\Testing\Tests\Functional;
 
 use Econic\Testing\Tests\Functional\Test;
 use TYPO3\Flow\Http\Response;
+use TYPO3\Flow\Reflection\ObjectAccess;
 
 /**
  * Proxy class for a response to make further assertions
@@ -51,6 +52,15 @@ class ResponseProxy {
 			$string,
 			$this->response->getContent(),
 			'The Response did not contain the string <' . $string . '>'
+		);
+		return $this;
+	}
+
+	public function containsPropertyPath($object, $propertyPath) {
+		$this->test->assertContains(
+			ObjectAccess::getPropertyPath($object, $propertyPath),
+			$this->response->getContent(),
+			'The Response did not contain the string <' . $string . '> (taken from ' . $propertyPath . ')'
 		);
 		return $this;
 	}
